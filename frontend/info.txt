@@ -1,0 +1,16 @@
+create vite project
+npm i redux toolkit
+npm i react-router-dom
+
+
+now steps of working
+
+
+make a app folder inside src
+-> create a store and configure store
+-> create feature inside feature make auth slot and appointment folder
+-> inside that folder make authSlice type folder
+
+make pages folder
+make components folder
+
