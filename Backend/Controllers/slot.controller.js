@@ -2,7 +2,7 @@ import { Slot } from "../Models/slotModel.js";
 
 export const createSlot = async (req, res) => {
     try {
-        if (req.user.userType  !== "Admin") {
+        if (req.user.userType !== "Admin") {
             return res.status(403).json({
                 message: "Access denied!! only Admin can create slot"
             })
@@ -16,7 +16,18 @@ export const createSlot = async (req, res) => {
             })
         }
 
-        const newSlot = new Slot({ date, from, to })
+        const existingSlot = async(req,res)=>{}
+
+        const selectedDate = new Date(date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (selectedDate < today) {
+            return res.status(400).json({
+                message: "Cannot create slot in previous date"
+            })
+        }
+
+        const newSlot = new Slot({ date:selectedDate, from, to })
         await newSlot.save();
 
         return res.status(201).json({
