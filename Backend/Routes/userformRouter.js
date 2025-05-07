@@ -1,8 +1,6 @@
 import express from 'express';
 
-
 import { verifyJwt } from '../Middleware/auth.middleware.js';
-// import { allAppointments, bookAppointment, getUserAppointment } from '';
 import { updateAppointmentStatus } from '../Controllers/appointment.controller.js';
 import { appointmentBook } from '../Controllers/appointment.controller.js';
 import { allAppointments } from '../Controllers/appointment.controller.js';

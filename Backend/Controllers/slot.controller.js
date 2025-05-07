@@ -16,7 +16,7 @@ export const createSlot = async (req, res) => {
             })
         }
 
-        const existingSlot = async(req,res)=>{}
+
 
         const selectedDate = new Date(date);
         const today = new Date();
@@ -27,7 +27,21 @@ export const createSlot = async (req, res) => {
             })
         }
 
-        const newSlot = new Slot({ date:selectedDate, from, to })
+        // Check if a slot already exists on the same date and overlapping time
+        const overlappingSlot = await Slot.findOne({
+            date: selectedDate,
+            $or: [
+                { from: { $lt: to }, to: { $gt: from } } // Check for overlapping time
+            ]
+        });
+
+        if (overlappingSlot) {
+            return res.status(400).json({
+                message: "A slot already exists during the selected time range"
+            });
+        }
+
+        const newSlot = new Slot({ date: selectedDate, from, to })
         await newSlot.save();
 
         return res.status(201).json({
