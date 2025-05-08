@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import { Slot } from "../Models/slotModel.js";
+import { userForm } from "../Models/userformModel.js";
 
 export const createSlot = async (req, res) => {
     try {
@@ -31,7 +33,7 @@ export const createSlot = async (req, res) => {
         const overlappingSlot = await Slot.findOne({
             date: selectedDate,
             $or: [
-                { from: { $lt: to }, to: { $gt: from } } // Check for overlapping time
+                { from: { $lt: to }, to: { $gt: from } }
             ]
         });
 
@@ -54,4 +56,83 @@ export const createSlot = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" })
 
     }
+}
+
+
+export const deleteSlot = async (req, res) => {
+    try {
+        if (req.user.userType !== "Admin") {
+            return res.status(403).json({
+                message: "Access denied!!. Only admin can delete the slot"
+            })
+        }
+
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid slot ID"
+            })
+        }
+
+        const slot = await Slot.findById(id);
+        if (!slot) {
+            return res.status(404).json({
+                message: "Slot not found"
+            })
+        }
+
+        await slot.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            message: "Slot deleted Successfully"
+        })
+
+    } catch (error) {
+        console.error("Error in deleting the slot", error)
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+export const getFilteredSlots = async (req, res) => {
+    try {
+        const userType = req.user.userType;
+
+        const bookedForm = await userForm.find({}, "slot")
+        const bookedSlotId = bookedForm.map(form => form.slot.toString());
+
+
+        if (userType === "Admin") {
+            const allSlots = await Slot.find().sort({ date: 1, from: 1 });
+            // Admin gets two arrays: bookedSlots and unbookedSlots
+            const bookedSlot = allSlots.filter(slots => bookedSlotId.includes(slots._id.toString()))
+            const unbookedSlot = allSlots.filter(slot => !bookedSlotId.includes(slot._id.toString()))
+
+
+            return res.status(200).json({
+                success: true,
+                bookedSlot,
+                unbookedSlot,
+                total: allSlots.length,
+            })
+        }
+        else {
+            const availableSlot = await Slot.find({
+                _id: { $nin: bookedSlotId }
+            }).sort({ date: 1, from: 1 });
+            return res.status(200).json({
+                success: true,
+                count: availableSlot.length,
+                slots: availableSlot,
+            })
+        }
+    } catch (error) {
+        console.error("Error fetching slots:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+
 }
