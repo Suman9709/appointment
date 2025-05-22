@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios from '../../pages/Config.js'
 
 export const slotAdd = createAsyncThunk('slot/create',
     async ({ date, to, from }, { rejectWithValue }) => {
@@ -11,7 +11,7 @@ export const slotAdd = createAsyncThunk('slot/create',
         try {
             const token = auth?.token;
             console.log("Sending token:", token);
-            const response = await axios.post("http://localhost:5000/api/slot/createslot", {
+            const response = await axios.post("/api/slot/createslot", {
                 date, to, from
             }, {
                 headers: {
@@ -31,7 +31,7 @@ export const slotDelete = createAsyncThunk('/slot/delete',
         const userType = auth?.user?.userType;
         const token = auth?.token;
         try {
-            await axios.delete(`http://localhost:5000/api/slot/slot/${id}`,
+            await axios.delete(`/api/slot/slot/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -48,7 +48,7 @@ export const slotDelete = createAsyncThunk('/slot/delete',
 export const fetchSlot = createAsyncThunk("allslot",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get("http://localhost:5000/api/slot/slots")
+            const response = await axios.get("/api/slot/slots")
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "failed to fetch all slot")

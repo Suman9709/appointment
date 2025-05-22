@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios from '../../pages/Config.js'
 
 
 export const bookAppointment = createAsyncThunk(
@@ -10,7 +10,7 @@ export const bookAppointment = createAsyncThunk(
 
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/form/book',
+                '/api/form/book',
                 formData,
                 {
                     headers: {
@@ -31,7 +31,7 @@ export const fetchUserAppointments = createAsyncThunk('appointment/fetchappointm
     const auth = JSON.parse(localStorage.getItem("auth"))
     const token = auth?.token;
     try {
-        const response = await axios.get('http://localhost:5000/api/form/getuserappointment', {
+        const response = await axios.get('/api/form/getuserappointment', {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -48,7 +48,7 @@ export const fetchAdminAppointments = createAsyncThunk(
         const auth = JSON.parse(localStorage.getItem("auth"));
         const token = auth?.token;
         try {
-            const response = await axios.get('http://localhost:5000/api/form/allappointments', {
+            const response = await axios.get('/api/form/allappointments', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -65,7 +65,7 @@ export const deleteAppointment = createAsyncThunk('appointment/deleteAppointment
     const auth = JSON.parse(localStorage.getItem('auth'))
     const token = auth?.token;
     try {
-        await axios.delete(`http://localhost:5000/api/form/appointments/${id}`, {
+        await axios.delete(`/api/form/appointments/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -82,7 +82,7 @@ export const updateAppointmentStatus = createAsyncThunk('appointment/updateAppoi
     const token = auth?.token;
     try {
         const response = await axios.patch(
-            `http://localhost:5000/api/form/appointment/${id}/status`,
+            `/api/form/appointment/${id}/status`,
             { status },
             {
                 headers: {
