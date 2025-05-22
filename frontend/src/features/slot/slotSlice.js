@@ -109,8 +109,8 @@ const slotSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-
             //addSlot
+            
             .addCase(slotAdd.pending, (state) => {
                 state.loading = true;
             })
