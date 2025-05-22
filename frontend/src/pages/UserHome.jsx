@@ -91,7 +91,7 @@ const UserHome = () => {
                   <h3 className="font-bold mb-4">Available Slots</h3>
                   {slotList && slotList.length > 0 ? (
                     slotList
-                      .filter(slot => userType === 'Admin' || !slot.booked) 
+                      .filter(slot => userType === 'Admin' || !slot.booked)
                       .map((slot) => (
                         <div key={slot._id} className="flex p-3 bg-blue-50 rounded-lg mb-2 items-center justify-between">
                           <div>
@@ -101,14 +101,14 @@ const UserHome = () => {
                           </div>
                           {userType === 'Admin' && (
                             <div>
-                              <img
+                              {/* <img
                                 src={img1}
                                 alt="delete"
                                 className="w-10 h-10 cursor-pointer"
                                 onClick={() => dispatch(slotDelete(slot._id))}
-                              />
+                              /> */}
 
-
+                              <button className='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 disabled:opacity-50' onClick={() => dispatch(slotDelete(slot._id))}>Delete</button>
                             </div>
                           )}
                         </div>
