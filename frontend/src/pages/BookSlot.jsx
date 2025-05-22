@@ -8,7 +8,7 @@ const BookSlot = () => {
     const [batch, setBatch] = useState('');
     const [slot, setSlot] = useState('');
 
-    const { isAuthenticated, user } = useSelector((state) => state.auth)
+    // const { isAuthenticated, user } = useSelector((state) => state.auth)
     const dispatch = useDispatch();
     const slotList = useSelector((state) => state.slots.unbookedSlot || []);
 
