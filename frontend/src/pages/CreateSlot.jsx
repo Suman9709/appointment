@@ -1,14 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiCalendar, FiClock, FiPlus } from 'react-icons/fi';
+import { fetchSlot, slotAdd } from '../features/slot/slotSlice';
+import { useDispatch, useSelector } from 'react-redux'
 
 const CreateSlot = () => {
     const [date, setDate] = useState('');
     const [to, setTo] = useState('');
     const [from, setFrom] = useState('');
 
+    const slotList = useSelector(state => state.slots.slotList);
+    const loading = useSelector(state => state.slots.loading);
+    const { user } = useSelector((state) => state.auth)
+
+    const dispatch = useDispatch()
+    const isAdmin = user?.userType === "Admin"
+
+    useEffect(() => {
+        dispatch(fetchSlot())
+    }, [dispatch])
     const handleSubmit = (e) => {
         e.preventDefault();
-    
+        if (!isAdmin) {
+            alert("You are not authorized to create slot")
+            return
+        }
+        console.log({ date, from, to });
+        dispatch(slotAdd({ date, from, to }))
+            .then(() => {
+                dispatch(fetchSlot())
+                setDate("")
+                setFrom("")
+                setTo("")
+            })
+
     };
 
     return (
@@ -89,6 +113,21 @@ const CreateSlot = () => {
                     Create Slot
                 </button>
             </form>
+            <div className="mt-10">
+                <h2 className="text-lg font-semibold text-gray-700 mb-3">Available Slots</h2>
+                <ul className="space-y-3">
+                    {slotList && slotList.length > 0 ? (
+                        slotList.map((slot, index) => (
+                            <li key={index} className="p-3 border rounded-lg bg-gray-50">
+                                <p className="text-sm text-gray-700"><strong>Date:</strong> {slot.date}</p>
+                                <p className="text-sm text-black-700"><strong>From:</strong> {slot.from} &nbsp; <strong>To:</strong> {slot.to}</p>
+                            </li>
+                        ))
+                    ) : (
+                        <p className="text-sm text-gray-500">No slots available.</p>
+                    )}
+                </ul>
+            </div>
         </div>
     );
 };

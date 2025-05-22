@@ -7,6 +7,7 @@ import UserHome from './pages/UserHome'
 import AdminHome from './pages/AdminHome'
 import BookSlot from './pages/BookSlot'
 import CreateSlot from './pages/CreateSlot'
+import UserBookedAppointment from './pages/UserBookedAppointment'
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Route path='/admin' element={<AdminHome />} />
         <Route path='/contact' element={<BookSlot />} />
         <Route path='/createslot' element={<CreateSlot />} />
+        <Route path='/userAppointment' element={<UserBookedAppointment/>}/>
       </Routes>
 
     </div>

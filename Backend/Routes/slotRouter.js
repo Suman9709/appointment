@@ -8,6 +8,6 @@ const slotRouter = express.Router();
 
 slotRouter.post("/createslot", verifyJwt, createSlot)
 slotRouter.delete("/slot/:id", verifyJwt, deleteSlot)
-slotRouter.get("/slots", verifyJwt, getFilteredSlots)
+slotRouter.get("/slots",getFilteredSlots)
 
 export default slotRouter

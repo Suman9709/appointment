@@ -1,13 +1,33 @@
 import React, { useState } from 'react';
+import { loginUser } from '../features/auth/authSlice';
+import{useDispatch, useSelector} from 'react-redux'
+import { useNavigate } from 'react-router-dom';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+const {loading, error} = useSelector((state)=>state.auth)
+const dispatch = useDispatch();
+const navigate = useNavigate();
+
+
+const handleLogin  =async(e)=>{
+  e.preventDefault();
+
+  const result = await dispatch (loginUser({email,password}))
+
+  if(loginUser.fulfilled.match(result)){
+    navigate('/')
+  }
+}
+
+
   return (
     <div className="max-w-md mx-auto mt-10 p-8 bg-white rounded-2xl shadow-lg border border-gray-100">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Log In</h2>
-      <form className="space-y-5">
+      <form className="space-y-5" onSubmit={handleLogin}>
 
         <div>
           <label className="block mb-2 text-sm font-medium text-gray-700">Email:</label>
@@ -60,8 +80,7 @@ const Login = () => {
           disabled={!email || ! password}
           className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200
             ${(!email || ! password)?'bg-gray-400 cursor-not-allowed':'bg-blue-600 hover:bg-blue-700 shadow-lg '}
-            `}
-        >
+            `}>
           Log In
         </button>
 

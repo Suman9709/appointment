@@ -41,8 +41,7 @@ export const appointmentBook = async (req, res) => {
 
         await newForm.save();
 
-        // Populate the 'slot' field after saving the form
-        // const populatedForm = await newForm.populate("slot")
+
         return res.status(201).json({
             message: "Slot booked successfully. Status: Pending.",
             data: newForm,
@@ -72,7 +71,11 @@ export const updateAppointmentStatus = async (req, res) => {
             return res.status(400).json({ message: "Invalid status." });
         }
 
-        const appointment = await userForm.findById(id);
+        const appointment = await userForm.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true }
+        );
         if (!appointment) {
             return res.status(404).json({ message: "Appointment not found." });
         }
@@ -157,7 +160,8 @@ export const deleteAppointment = async (req, res) => {
 
         await userForm.findByIdAndDelete(id);
         return res.status(200).json({
-            message: "Appointmment Deleted successfully"
+           message: "Appointment deleted successfully"
+
         })
 
     } catch (error) {

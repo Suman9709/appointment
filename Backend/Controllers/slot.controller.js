@@ -18,20 +18,35 @@ export const createSlot = async (req, res) => {
             })
         }
 
+        // const now = new Date();
+        // const selectedFromDateTime = new Date(`${date}T${from}`)
 
+        // if (selectedFromDateTime < now) {
+        //     return res.status(400).json({
+        //         message: "Cannot create slot in previous date"
+        //     })
+        // }
 
-        const selectedDate = new Date(date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (selectedDate < today) {
+        const fromDateTime = new Date(`${date}T${from}`)
+        const toDateTime = new Date(`${date}T${to}`)
+        const now = new Date();
+
+        if (fromDateTime > toDateTime) {
             return res.status(400).json({
-                message: "Cannot create slot in previous date"
+                message: "From time must be earlier than to to"
+            })
+        };
+
+        if (fromDateTime < now) {
+            return res.status(400).json({
+                message: "cannot create slot in previous date and time"
             })
         }
 
+
         // Check if a slot already exists on the same date and overlapping time
         const overlappingSlot = await Slot.findOne({
-            date: selectedDate,
+            date: fromDateTime,
             $or: [
                 { from: { $lt: to }, to: { $gt: from } }
             ]
@@ -43,7 +58,7 @@ export const createSlot = async (req, res) => {
             });
         }
 
-        const newSlot = new Slot({ date: selectedDate, from, to })
+        const newSlot = new Slot({ date: fromDateTime, from, to })
         await newSlot.save();
 
         return res.status(201).json({
@@ -82,7 +97,7 @@ export const deleteSlot = async (req, res) => {
             })
         }
 
-        await slot.findByIdAndDelete(id);
+        await Slot.findByIdAndDelete(id);
 
         return res.status(200).json({
             message: "Slot deleted Successfully"
@@ -98,41 +113,50 @@ export const deleteSlot = async (req, res) => {
 
 export const getFilteredSlots = async (req, res) => {
     try {
-        const userType = req.user.userType;
+       
 
-        const bookedForm = await userForm.find({}, "slot")
+        const bookedForm = await userForm.find({}, "slot");
         const bookedSlotId = bookedForm.map(form => form.slot.toString());
 
+        const allSlots = await Slot.find().sort({ date: 1, from: 1 });
 
-        if (userType === "Admin") {
-            const allSlots = await Slot.find().sort({ date: 1, from: 1 });
-            // Admin gets two arrays: bookedSlots and unbookedSlots
-            const bookedSlot = allSlots.filter(slots => bookedSlotId.includes(slots._id.toString()))
-            const unbookedSlot = allSlots.filter(slot => !bookedSlotId.includes(slot._id.toString()))
+        const now = new Date();
+        const todayDate = now.toISOString().split("T")[0]; // 'YYYY-MM-DD'
 
+        // Filter booked slots: Only today's date
+        const bookedSlot = allSlots.filter(slot => {
+            const slotDate = new Date(slot.date).toISOString().split("T")[0];
+            return bookedSlotId.includes(slot._id.toString()) && slotDate === todayDate;
+        });
 
-            return res.status(200).json({
-                success: true,
-                bookedSlot,
-                unbookedSlot,
-                total: allSlots.length,
-            })
-        }
-        else {
-            const availableSlot = await Slot.find({
-                _id: { $nin: bookedSlotId }
-            }).sort({ date: 1, from: 1 });
-            return res.status(200).json({
-                success: true,
-                count: availableSlot.length,
-                slots: availableSlot,
-            })
-        }
+        // Filter unbooked slots: Only today's date and future `from` time
+        const unbookedSlot = allSlots.filter(slot => {
+            if (bookedSlotId.includes(slot._id.toString())) return false;
+
+            const slotDate = new Date(slot.date).toISOString().split("T")[0];
+            if (slotDate !== todayDate) return false;
+
+            const [hours, minutes] = slot.from.split(":").map(Number);
+            const slotDateTime = new Date(slot.date);
+            slotDateTime.setHours(hours, minutes, 0, 0);
+
+            return slotDateTime > now;
+        });
+
+        return res.status(200).json({
+            success: true,
+            bookedSlot,
+            unbookedSlot,
+            total: bookedSlot.length + unbookedSlot.length,
+        });
+
     } catch (error) {
-        console.error("Error fetching slots:", error);
+        console.error("Error filtering slots:", error);
         return res.status(500).json({
             message: "Internal server error",
         });
     }
+};
 
-}
+
+

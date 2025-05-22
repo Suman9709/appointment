@@ -1,7 +1,15 @@
 import React from 'react';
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom';
+import { logout } from '../features/auth/authSlice';
+
+
 const Navbar = () => {
-  const { isAuthenticated } = ((state) => state.auth)
+  const { isAuthenticated, user } = useSelector((state) => state.auth)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  // const isAdmin = user?.userType === "Admin"
+
 
   return (
     <div className='w-full bg-cyan-300 shadow-md'>
@@ -18,32 +26,71 @@ const Navbar = () => {
           <div className='hidden md:block'>
             <ul className='ml-10 flex items-center space-x-8'>
               <li>
-                <a href="#" className='text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors'>
+                <Link to="/" className='text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors'>
                   Home
-                </a>
+                </Link>
               </li>
-              {isAuthenticated ? (
+              {isAuthenticated || user ? (
                 <>
                   <li>
-                    <a href="#" className='text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors'>
-                      Book Appointment
-                    </a>
+                    {user.userType === "Admin" ? (
+                      <div>
+                        <Link
+                          to="/createslot"
+                          className="text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                        >
+                          Create Slot
+                        </Link>
+                        <Link
+                          to="/admin"
+                          className="text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                        >
+                          Booked Slot
+                        </Link>
+                      </div>
+
+
+                    ) : (
+                      <div>
+                        <Link
+                        to="/contact"
+                        className="text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                      >
+                        Book Appointment
+                      </Link>
+
+                      <Link
+                        to="/userAppointment"
+                        className="text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                      >
+                       My Appointment
+                      </Link>
+                      </div>
+                    )}
                   </li>
                   <li>
-                    <a href="#" className='text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors'>
+                    <button
+                      onClick={() => {
+                        dispatch(logout());
+                        navigate("/");
+                      }}
+                      className="text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    >
                       Logout
-                    </a>
+                    </button>
                   </li>
                 </>
-              ) :
-                <>
-                  <li>
-                    <a href="#" className='text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors'>
-                      Login/SignUp
-                    </a>
-                  </li>
-                </>
-              }
+              ) : (
+                <li>
+                  <Link
+                    to="/login"
+                    className="text-gray-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Login / SignUp
+                  </Link>
+                </li>
+              )}
+
 
 
             </ul>
