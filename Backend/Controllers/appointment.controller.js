@@ -41,8 +41,7 @@ export const appointmentBook = async (req, res) => {
 
         await newForm.save();
 
-        // Populate the 'slot' field after saving the form
-        // const populatedForm = await newForm.populate("slot")
+
         return res.status(201).json({
             message: "Slot booked successfully. Status: Pending.",
             data: newForm,
@@ -72,7 +71,11 @@ export const updateAppointmentStatus = async (req, res) => {
             return res.status(400).json({ message: "Invalid status." });
         }
 
-        const appointment = await userForm.findById(id);
+        const appointment = await userForm.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true }
+        );
         if (!appointment) {
             return res.status(404).json({ message: "Appointment not found." });
         }
@@ -93,7 +96,7 @@ export const allAppointments = async (req, res) => {
         let appointments;
 
         if (req.user.userType === "Admin") {
-            appointments = await userForm.find().populate("slot").populate("user", "name, email")
+            appointments = await userForm.find().populate("slot").populate("user", "name email")
         }
         else {
             appointments = await userForm.find({ user: req.user._id }).populate("slot")
@@ -129,5 +132,47 @@ export const getUserAppointment = async (req, res) => {
         })
     }
 }
+
+export const deleteAppointment = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid appointment ID"
+            })
+        }
+        const appointment = await userForm.findById(id);
+        if (!appointment) {
+            return res.status(404).json({
+                message: "Appointment not found"
+            })
+        }
+
+        const isAdmin = req.user.userType === "Admin";
+        const isOwner = appointment.user.toString() === req.user._id.toString();
+
+        if (!isAdmin && !isOwner) {
+            return res.status(403).json({
+                message: "Access Denied you cannnot delete the appointment"
+            })
+        }
+
+        await userForm.findByIdAndDelete(id);
+        return res.status(200).json({
+           message: "Appointment deleted successfully"
+
+        })
+
+    } catch (error) {
+        console.error("Error in deleting the appointment", error)
+        res.status(500).json({
+            message: "Internal server error"
+        })
+
+    }
+}
+
+
 
 

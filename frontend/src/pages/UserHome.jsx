@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { fetchSlot } from '../features/slot/slotSlice';
+import image from '../Images/deleteIcon1.png'
+import { slotDelete } from '../features/slot/slotSlice';
 
 const UserHome = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('services');
+
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const userType = user?.userType;
+  const slotList = useSelector(state => state.slots.slotList);
+
 
   const services = [
     { id: 1, name: 'DSA' },
@@ -12,9 +21,14 @@ const UserHome = () => {
     { id: 4, name: 'Mock Interview' }
   ];
 
-  const handleBookNow = (serviceId) => {
-    navigate(`/book/${serviceId}`);
-  };
+  const dispatch = useDispatch();
+
+ useEffect(() => {
+  if ((userType === 'Admin' || userType === "Student") && isAuthenticated) {
+    dispatch(fetchSlot());
+  }
+}, [dispatch, userType, isAuthenticated]);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
@@ -31,7 +45,7 @@ const UserHome = () => {
             </div>
           </div>
           <div>
-            <h2 className="font-bold text-lg">Alex Johnson</h2>
+            <h2 className="font-bold text-lg">Explorin Academy</h2>
             <p className="text-gray-500">Professional Coach</p>
           </div>
         </div>
@@ -44,7 +58,9 @@ const UserHome = () => {
             Services
           </button>
           <button
-            onClick={() => setActiveTab('availability')}
+            onClick={() => {
+              isAuthenticated === true ? setActiveTab("availability") : navigate('/login')
+            }}
             className={`flex-1 py-3 font-medium ${activeTab === 'availability' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500'}`}
           >
             Availability
@@ -58,43 +74,75 @@ const UserHome = () => {
                 <div
                   key={service.id}
                   className="p-4 border rounded-lg hover:bg-indigo-50 transition cursor-pointer"
-                  onClick={() => handleBookNow(service.id)}
                 >
                   <div className="flex justify-between items-center">
                     <div>
                       <h3 className="font-medium">{service.name}</h3>
                       <p className="text-sm text-gray-500">{service.duration}</p>
                     </div>
-                    <div className="text-indigo-600 font-bold">{service.price}</div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="font-medium">Monday - Friday</p>
-                <p className="text-sm text-gray-600">9:00 AM - 5:00 PM</p>
-              </div>
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="font-medium">Saturday</p>
-                <p className="text-sm text-gray-600">10:00 AM - 2:00 PM</p>
-              </div>
-              <div className="p-3 bg-gray-100 rounded-lg">
-                <p className="font-medium text-gray-500">Sunday</p>
-                <p className="text-sm text-gray-500">Not available</p>
-              </div>
+              {userType === 'Admin' || userType === 'Student' ? (
+                <div>
+                  <h3 className="font-bold mb-4">Available Slots</h3>
+                  {slotList && slotList.length > 0 ? (
+                    slotList
+                      .filter(slot => userType === 'Admin' || !slot.booked) // show all to Admin, only unbooked to Students
+                      .map((slot) => (
+                        <div key={slot._id} className="flex p-3 bg-blue-50 rounded-lg mb-2 items-center justify-between">
+                          <div>
+                            <p><strong>Date:</strong> {slot.date}</p>
+                            <p><strong>From:</strong> {slot.from}</p>
+                            <p><strong>To:</strong> {slot.to}</p>
+                          </div>
+                          {userType === 'Admin' && (
+                            <div>
+                              <img
+                                src={image}
+                                alt="delete"
+                                className="w-10 h-10 cursor-pointer"
+                                onClick={() => dispatch(slotDelete(slot._id))}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))
+                  ) : (
+                    <p>No slots available.</p>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <p className="text-gray-600">Check availability by contacting support or use services tab.</p>
+                </div>
+              )}
             </div>
+
           )}
         </div>
         <div className="p-6">
           <button
-            onClick={() => navigate('/contact')}
+            onClick={() => {
+              if (isAuthenticated === true) {
+                if (userType === "Admin") {
+                  navigate("/createslot");
+                } else {
+                  navigate("/contact");
+                }
+              } else {
+                navigate("/login");
+              }
+            }}
             className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition"
           >
-            Contact Me
+            {userType === "Admin" ? "Create Slot" : "Contact Us"}
           </button>
         </div>
+
       </main>
     </div>
   );

@@ -11,9 +11,9 @@ const app = express()
 dotenv.config()
 
 app.use(cors({
-    origin: 'http://localhost:5173', 
-    credentials: true,
-  }));
+  origin: process.env.CORS,
+  credentials: true,
+}));
 
 app.use(express.json())
 app.use(cookieParser())
@@ -28,7 +28,7 @@ app.use('/api/form', formRouter)
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
-    console.log(`Server is running on ${PORT}`);
+  console.log(`Server is running on ${PORT}`);
 
 })
 
