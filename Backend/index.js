@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser';
 import router from './Routes/userRouter.js';
 import slotRouter from './Routes/slotRouter.js';
 import formRouter from './Routes/userformRouter.js';
+import fetch from 'node-fetch';
+
 
 const app = express();
 dotenv.config();
@@ -30,10 +32,10 @@ const BASE_URL_local = 'http://localhost:5000/api/auth/ping';
 
 
 setInterval(() => {
-    fetch(BASE_URL) 
+    fetch(BASE_URL_local) 
         .then(response => console.log("Self-ping successful:", response.status))
         .catch(error => console.error("Self-ping failed:", error));
-},    1000)
+},    9000)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
