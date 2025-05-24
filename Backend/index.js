@@ -18,31 +18,27 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Connect to MongoDB
 connectDB();
 
-// ✅ Health Check Route to avoid 404 during ping
 app.get('/api/ping', (req, res) => {
   res.send('pong');
 });
 
-// API Routes
 app.use('/api/auth', router);
 app.use('/api/slot', slotRouter);
 app.use('/api/form', formRouter);
 
-// ✅ Self-ping every 1 minute for all routes
-const BASE_URL = 'https://appointment-1-pq6g.onrender.com';
+const BASE_URL = 'https://appointment-1-pq6g.onrender.com/api/auth/ping';
+// const BASE_URL_local = 'http://localhost:5000/api/auth/ping';
 
-const pingRoutes = ['/api/ping', '/api/auth', '/api/slot', '/api/form'];
+// const pingRoutes = ['/api/auth', '/api/slot', '/api/form'];
 
 setInterval(() => {
-  pingRoutes.forEach(route => {
-    fetch(`${BASE_URL}${route}`)
-      .then(res => console.log(`Pinged ${route}:`, res.status))
-      .catch(err => console.error(`Error pinging ${route}:`, err));
-  });
-}, 60 * 1000); // every 1 minute
+  fetch(BASE_URL)
+    .then(res => console.log(`Pinged`, res.status))
+    .catch(err => console.error(`Error pinging`, err));
+}, 5 * 1000);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
