@@ -118,13 +118,6 @@ export const logoutUser = async (req, res) => {
     }
 }
 
-export const pingUser = async (req, res) => {
-    try {
-        return res.status(200).json({ message: "Ping successful" });
-    } catch (error) {
-        return res.status(500).json({ message: "Ping failed" });
-    }
-};
 
 
 
