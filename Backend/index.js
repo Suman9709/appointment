@@ -33,7 +33,7 @@ setInterval(() => {
     fetch(BASE_URL) 
         .then(response => console.log("Self-ping successful:", response.status))
         .catch(error => console.error("Self-ping failed:", error));
-},  10 * 60 * 1000)
+},    1000)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
