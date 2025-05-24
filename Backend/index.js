@@ -20,25 +20,20 @@ app.use(cookieParser());
 
 connectDB();
 
-app.get('/api/ping', (req, res) => {
-  res.send('pong');
-});
 
 app.use('/api/auth', router);
 app.use('/api/slot', slotRouter);
 app.use('/api/form', formRouter);
 
 const BASE_URL = 'https://appointment-1-pq6g.onrender.com/api/auth/ping';
-// const BASE_URL_local = 'http://localhost:5000/api/auth/ping';
+const BASE_URL_local = 'http://localhost:5000/api/auth/ping';
 
-// const pingRoutes = ['/api/auth', '/api/slot', '/api/form'];
 
-setInterval(() => {
+setInterval(()=>{
   fetch(BASE_URL)
-    .then(res => console.log(`Pinged`, res.status))
-    .catch(err => console.error(`Error pinging`, err));
-}, 5 * 1000);
-
+  .then((res)=>console.log("Ping server",res.status))
+  .catch((error)=>console.log(error))
+}, 1000)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
