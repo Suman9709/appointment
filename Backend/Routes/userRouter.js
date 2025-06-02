@@ -8,10 +8,4 @@ router.post('/login', loginUser)
 router.post('/logout', logoutUser)
 
 
-router.get('/ping', (req, res) => {
-    return res.status(200).json({ message: 'Ping successful' });
-})
-
-
-
 export default router

@@ -8,18 +8,10 @@ import AdminHome from './pages/AdminHome'
 import BookSlot from './pages/BookSlot'
 import CreateSlot from './pages/CreateSlot'
 import UserBookedAppointment from './pages/UserBookedAppointment'
-import { pingBackend } from './pingBackend'
-import { useEffect } from 'react'
+
 
 const App = () => {
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      pingBackend();
-    }, 5000);
-
-    return () => clearInterval(interval)
-  }, [])
   return (
     <div>
       <Navbar />

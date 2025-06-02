@@ -25,24 +25,27 @@ connectDB();
 
 
 
-// const BASE_URL = 'https://appointment-1-pq6g.onrender.com/ping';
-// const BASE_URL_local = 'http://localhost:5000/api/auth/ping';
+const BASE_URL = 'https://appointment-1-pq6g.onrender.com/ping';
+// const BASE_URL_local = 'http://localhost:5000/ping';
 
+app.get("/ping", (req,res)=>{
+  res.send("Ping Successfully")
+});
 
-
-// setInterval(async () => {
-//   try {
-//     const res = await fetch(BASE_URL);
-//     console.log("Pinged:", res.status);
-//   } catch (err) {
-//     console.error("Ping failed:", err.message);
-//   }
-// }, 5000);
+setInterval(async () => {
+  try {
+    const res = await fetch(BASE_URL);
+    console.log("Pinged:", res.status);
+  } catch (err) {
+    console.error("Ping failed:", err.message);
+  }
+}, 5000);
 
 
 app.use('/api/auth', router);
 app.use('/api/slot', slotRouter);
 app.use('/api/form', formRouter);
+
 
 
 
