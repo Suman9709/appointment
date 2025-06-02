@@ -26,7 +26,7 @@ connectDB();
 
 
 const BASE_URL = 'https://appointment-1-pq6g.onrender.com/ping';
-// const BASE_URL_local = 'http://localhost:5000/ping';
+const BASE_URL_local = 'http://localhost:5000/ping';
 
 app.get("/ping", (req,res)=>{
   res.send("Ping Successfully")
@@ -39,7 +39,7 @@ setInterval(async () => {
   } catch (err) {
     console.error("Ping failed:", err.message);
   }
-}, 5000);
+}, 10000);
 
 
 app.use('/api/auth', router);
